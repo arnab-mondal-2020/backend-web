@@ -8,5 +8,10 @@
     "name": "backend.web.static-path",
     "type": "java.lang.String",
     "description": "A description for 'backend.web.static-path'"
+  },
+  {
+    "name": "session.svc.url",
+    "type": "java.lang.String",
+    "description": "A description for 'session.svc.url'"
   }
 ]}

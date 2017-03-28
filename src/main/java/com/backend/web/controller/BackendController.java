@@ -27,26 +27,25 @@ public class BackendController implements RequestMappings, BackendConstants {
 
   @RequestMapping(value = REQUEST_LOAD_BACK_END, method = {RequestMethod.GET, RequestMethod.POST})
   public ModelAndView loadPage(HttpServletRequest request) throws BackendWebException {
-    request.getAttribute(USER_NUMBER);
-    AdminUser user = new AdminUser();
+    String userNumber = (String) request.getAttribute(USER_NUMBER);
+    userNumber = userNumber == null ? "00000005" : userNumber;
+    AdminUser user = null;
     ModelAndView mav = new ModelAndView(RETURN_BACK_END);
-    // user = service.getUserInfoByNumber(userNumber);
-    user.setFullName("Arnab Mondal");
-    user.setAuthLevel("SU");
-    request.setAttribute(USER_INFO, user);
-    request.setAttribute(FIRST_NAME_PROP, user.getFullName());
-    CommonUtil.setWelcomeMessage(request);
+    try {
+      user = service.getUserInfoByNumber(userNumber);
+      request.setAttribute(USER_INFO, user);
+      request.setAttribute(FIRST_NAME_PROP, user.getFullName());
+      CommonUtil.setWelcomeMessage(request);
 
-    if (!user.getAuthLevel().equalsIgnoreCase("SU")) {
-      return new ModelAndView("forward:/unauthorized");
+      if (!user.getAuthLevel().equalsIgnoreCase("SU")) {
+        return new ModelAndView("forward:/unauthorized");
+      }
+      List<Degree> degrees;
+      degrees = service.getAllDegrees();
+      request.setAttribute(BackendConstants.ALL_DEGREES_OPT, degrees);
+    } catch (BackendWebException e) {
+      System.err.println(e.getMessage());
     }
-    List<Degree> degrees;
-    DegreeList degreeList = new DegreeList();
-    degreeList.setPageNoStr("1");
-    degreeList.setRecordCountStr("12");
-    degreeList.setTotalRecord(50);
-    degrees = service.getAllDegrees(degreeList).getDegrees();
-    request.setAttribute(BackendConstants.ALL_DEGREES_OPT, degrees);
 
     return mav;
   }
